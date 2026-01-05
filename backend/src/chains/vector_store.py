@@ -4,9 +4,23 @@ from typing import List, Optional
 from pathlib import Path
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma, Pinecone
-from langchain_community.vectorstores.pinecone import PineconeVectorStore
-import pinecone
+from langchain_community.vectorstores import Chroma
+try:
+    from langchain_community.vectorstores import Pinecone as PineconeVectorStore
+except ImportError:
+    try:
+        from langchain_pinecone import PineconeVectorStore
+    except ImportError:
+        PineconeVectorStore = None
+
+# Optional pinecone import (only needed if using Pinecone)
+# Note: Modern Pinecone SDK uses 'pinecone' package (not 'pinecone-client')
+try:
+    import pinecone
+    from pinecone import Pinecone as PineconeClient
+except ImportError:
+    pinecone = None
+    PineconeClient = None
 
 from src.utils.logger import get_logger
 from src.config import settings
@@ -82,31 +96,62 @@ class VectorStore:
     def _init_pinecone(self) -> None:
         """Initialize Pinecone vector store (production)."""
         try:
+            if pinecone is None:
+                raise ImportError("pinecone package not installed. Install with: pip install pinecone")
+            
+            if PineconeVectorStore is None:
+                raise ImportError("PineconeVectorStore not available. Install langchain-pinecone or langchain-community")
+            
             if not settings.pinecone_api_key:
                 raise ValueError("Pinecone API key not configured")
             
             if not settings.pinecone_index_name:
                 raise ValueError("Pinecone index name not configured")
             
-            # Initialize Pinecone client
-            pinecone.init(
-                api_key=settings.pinecone_api_key,
-                environment=settings.pinecone_environment
-            )
-            
-            # Get or create index
+            # Initialize Pinecone client (modern SDK v5+)
             index_name = settings.pinecone_index_name
             
-            # Check if index exists
-            if index_name not in pinecone.list_indexes():
-                logger.warning(f"Index {index_name} not found. Please create it in Pinecone dashboard.")
-                raise ValueError(f"Pinecone index '{index_name}' does not exist")
-            
-            # Initialize Pinecone vector store
-            self.vectorstore = PineconeVectorStore(
-                index_name=index_name,
-                embedding=self.embeddings
-            )
+            if PineconeClient:
+                # Modern Pinecone SDK (v5+) - uses Pinecone() class
+                pc = PineconeClient(api_key=settings.pinecone_api_key)
+                
+                # Check if index exists
+                try:
+                    indexes = [idx.name for idx in pc.list_indexes()]
+                    if index_name not in indexes:
+                        logger.warning(f"Index {index_name} not found. Please create it in Pinecone dashboard.")
+                        raise ValueError(f"Pinecone index '{index_name}' does not exist")
+                except Exception as e:
+                    logger.error(f"Failed to list Pinecone indexes: {e}")
+                    raise ValueError(f"Failed to connect to Pinecone: {str(e)}")
+                
+                # Initialize Pinecone vector store
+                self.vectorstore = PineconeVectorStore(
+                    index_name=index_name,
+                    embedding=self.embeddings
+                )
+            elif pinecone:
+                # Legacy Pinecone SDK (fallback for older versions)
+                pinecone.init(
+                    api_key=settings.pinecone_api_key,
+                    environment=settings.pinecone_environment
+                )
+                
+                # Check if index exists
+                if index_name not in pinecone.list_indexes():
+                    logger.warning(f"Index {index_name} not found. Please create it in Pinecone dashboard.")
+                    raise ValueError(f"Pinecone index '{index_name}' does not exist")
+                
+                # Initialize Pinecone vector store
+                self.vectorstore = PineconeVectorStore(
+                    index_name=index_name,
+                    embedding=self.embeddings
+                )
+            else:
+                raise ImportError(
+                    "Pinecone package not installed. "
+                    "Install with: pip install pinecone"
+                )
             
             logger.info(f"Pinecone initialized: {index_name}")
             
@@ -306,8 +351,24 @@ class VectorStore:
                 info["count"] = collection.count()
             elif self.vector_db_type == "pinecone":
                 # Get Pinecone index info
-                index = pinecone.Index(settings.pinecone_index_name)
-                info["count"] = index.describe_index_stats().get("total_vector_count", 0)
+                if PineconeClient and settings.pinecone_api_key:
+                    try:
+                        pc = PineconeClient(api_key=settings.pinecone_api_key)
+                        index = pc.Index(settings.pinecone_index_name)
+                        stats = index.describe_index_stats()
+                        info["count"] = stats.get("total_vector_count", 0)
+                    except Exception as e:
+                        logger.warning(f"Failed to get Pinecone stats: {e}")
+                        info["count"] = 0
+                elif pinecone:
+                    try:
+                        index = pinecone.Index(settings.pinecone_index_name)
+                        info["count"] = index.describe_index_stats().get("total_vector_count", 0)
+                    except Exception as e:
+                        logger.warning(f"Failed to get Pinecone stats: {e}")
+                        info["count"] = 0
+                else:
+                    info["count"] = 0
             
             return info
             

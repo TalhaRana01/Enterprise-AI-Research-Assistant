@@ -1,8 +1,7 @@
 """Router agent for directing tasks to appropriate specialized agents."""
 
 from typing import Dict, Any, Optional
-from langchain.agents import AgentExecutor, create_openai_functions_agent
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
 from src.utils.logger import get_logger
@@ -107,31 +106,14 @@ Your job is to analyze user queries and determine which specialized agent should
 
 Respond with the agent name: "search", "qa", "summarize", or "multi-step" followed by reasoning."""
 
-        # Create agent prompt
+        # Create prompt template
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", router_prompt),
             ("human", "{input}"),
-            MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])
         
-        # Create agent (though it won't use tools, just routing logic)
-        self.agent = create_openai_functions_agent(
-            llm=self.llm,
-            tools=self.tools,
-            prompt=self.prompt
-        )
-        
-        # Create agent executor
-        self.agent_executor = AgentExecutor(
-            agent=self.agent,
-            tools=self.tools,
-            verbose=self.verbose,
-            max_iterations=5,
-            max_execution_time=30,
-            handle_parsing_errors=True
-        )
-        
-        logger.info("RouterAgent initialized successfully")
+        # Simplified: Use keyword-based routing (no agent executor needed)
+        logger.info("RouterAgent initialized successfully (simplified mode)")
     
     def route(self, query: str) -> Dict[str, Any]:
         """

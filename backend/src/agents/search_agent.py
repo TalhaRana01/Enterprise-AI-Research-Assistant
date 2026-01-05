@@ -1,8 +1,7 @@
 """Search agent for finding research papers."""
 
 from typing import List, Dict, Any, Optional
-from langchain.agents import AgentExecutor, create_openai_functions_agent
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
 from src.utils.logger import get_logger
@@ -79,32 +78,15 @@ Always prioritize:
 
 Format your response clearly with numbered results and brief explanations."""
         
-        # Create agent prompt
+        # Create prompt template
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
             ("human", "{input}"),
-            MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])
         
-        # Create agent
-        self.agent = create_openai_functions_agent(
-            llm=self.llm,
-            tools=self.tools,
-            prompt=self.prompt
-        )
-        
-        # Create agent executor
-        self.agent_executor = AgentExecutor(
-            agent=self.agent,
-            tools=self.tools,
-            verbose=self.verbose,
-            max_iterations=10,
-            max_execution_time=60,
-            handle_parsing_errors=True,
-            return_intermediate_steps=self.verbose
-        )
-        
-        logger.info("SearchAgent initialized successfully")
+        # Simplified: Use tools directly instead of agent executor
+        # For LangChain 1.2.0+, we'll use tools directly
+        logger.info("SearchAgent initialized successfully (simplified mode)")
     
     def search(self, query: str) -> Dict[str, Any]:
         """
@@ -119,14 +101,18 @@ Format your response clearly with numbered results and brief explanations."""
         try:
             logger.info(f"SearchAgent processing query: '{query[:50]}...'")
             
-            # Invoke agent
-            result = self.agent_executor.invoke({"input": query})
+            # Use search tool directly (simplified for LangChain 1.2.0+)
+            search_result = search_papers_tool.invoke({
+                "query": query,
+                "max_results": 10,
+                "source": "arxiv"
+            })
             
             logger.info("SearchAgent completed successfully")
             return {
-                "output": result.get("output", ""),
+                "output": search_result,
                 "query": query,
-                "intermediate_steps": result.get("intermediate_steps", []) if self.verbose else []
+                "intermediate_steps": []
             }
             
         except Exception as e:

@@ -1,8 +1,7 @@
 """Summarization agent for creating summaries of research papers."""
 
 from typing import Dict, Any, Optional
-from langchain.agents import AgentExecutor, create_openai_functions_agent
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
 from src.utils.logger import get_logger
@@ -87,32 +86,14 @@ You can:
 - Generate bullet point summaries
 - Extract specific information from papers"""
         
-        # Create agent prompt
+        # Create prompt template
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
             ("human", "{input}"),
-            MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])
         
-        # Create agent
-        self.agent = create_openai_functions_agent(
-            llm=self.llm,
-            tools=self.tools,
-            prompt=self.prompt
-        )
-        
-        # Create agent executor
-        self.agent_executor = AgentExecutor(
-            agent=self.agent,
-            tools=self.tools,
-            verbose=self.verbose,
-            max_iterations=10,
-            max_execution_time=90,
-            handle_parsing_errors=True,
-            return_intermediate_steps=self.verbose
-        )
-        
-        logger.info("SummarizationAgent initialized successfully")
+        # Simplified: Use summarization chain directly
+        logger.info("SummarizationAgent initialized successfully (simplified mode)")
     
     def summarize(
         self,

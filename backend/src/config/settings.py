@@ -1,7 +1,7 @@
 """Application settings and configuration."""
 
 from typing import List, Optional
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +19,22 @@ class Settings(BaseSettings):
     # Environment
     environment: str = Field(default="development", description="Environment name")
     debug: bool = Field(default=False, description="Debug mode")
+    
+    @field_validator("debug", mode="before")
+    @classmethod
+    def validate_debug(cls, v):
+        """Validate debug field, handle invalid values like 'WARN'."""
+        if isinstance(v, bool):
+            return v
+        if isinstance(v, str):
+            v_lower = v.lower().strip()
+            if v_lower in ("true", "1", "yes", "on"):
+                return True
+            elif v_lower in ("false", "0", "no", "off", ""):
+                return False
+            # If invalid value (like "WARN"), return default False
+            return False
+        return bool(v) if v else False
     
     # API Configuration
     api_host: str = Field(default="0.0.0.0", description="API host")

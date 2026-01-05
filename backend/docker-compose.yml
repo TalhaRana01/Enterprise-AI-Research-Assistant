@@ -33,12 +33,12 @@ services:
       timeout: 5s
       retries: 5
 
-  # Main Application
-  app:
+  # Backend Application (FastAPI)
+  backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
-    container_name: research-assistant-app
+    container_name: research-assistant-backend
     environment:
       - ENVIRONMENT=development
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/research_assistant_dev
@@ -46,15 +46,29 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./src:/app/src
-      - ./logs:/app/logs
-      - ./data:/app/data
+      - ./backend/src:/app/src
+      - ./backend/logs:/app/logs
+      - ./backend/data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend Application (React.js - to be added)
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: research-assistant-frontend
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+  #   depends_on:
+  #     - backend
 
   # Prometheus (Monitoring)
   prometheus:

@@ -1,8 +1,7 @@
 """Question-answering agent using RAG for research papers."""
 
 from typing import Dict, Any, Optional, List
-from langchain.agents import AgentExecutor, create_openai_functions_agent
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
 from src.utils.logger import get_logger
@@ -82,32 +81,14 @@ Guidelines:
 - If you need to search for papers, use the search tool first
 - Then use the RAG system to answer based on retrieved papers"""
         
-        # Create agent prompt
+        # Create prompt template
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
             ("human", "{input}"),
-            MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])
         
-        # Create agent
-        self.agent = create_openai_functions_agent(
-            llm=self.llm,
-            tools=self.tools,
-            prompt=self.prompt
-        )
-        
-        # Create agent executor
-        self.agent_executor = AgentExecutor(
-            agent=self.agent,
-            tools=self.tools,
-            verbose=self.verbose,
-            max_iterations=15,
-            max_execution_time=120,
-            handle_parsing_errors=True,
-            return_intermediate_steps=self.verbose
-        )
-        
-        logger.info("QAAgent initialized successfully")
+        # Simplified: Use RAG chain directly (no agent executor needed)
+        logger.info("QAAgent initialized successfully (simplified mode)")
     
     def answer(
         self,
@@ -154,17 +135,7 @@ Guidelines:
             
         except Exception as e:
             logger.error(f"QAAgent failed: {e}")
-            # Fallback: try agent executor
-            try:
-                agent_result = self.agent_executor.invoke({"input": question})
-                return {
-                    "answer": agent_result.get("output", ""),
-                    "question": question,
-                    "method": "agent"
-                }
-            except Exception as agent_error:
-                logger.error(f"Agent fallback also failed: {agent_error}")
-                raise Exception(f"Failed to answer question: {str(e)}")
+            raise Exception(f"Failed to answer question: {str(e)}")
     
     def answer_with_search(
         self,
@@ -187,9 +158,12 @@ Guidelines:
             
             logger.info(f"Answering with search: question='{question}', search='{query}'")
             
-            # First search for papers
-            search_result = self.agent_executor.invoke({
-                "input": f"Search for papers about: {query}"
+            # First search for papers (using search tool directly)
+            from src.tools import search_papers_tool
+            search_result = search_papers_tool.invoke({
+                "query": query,
+                "max_results": 10,
+                "source": "arxiv"
             })
             
             # Then answer using RAG

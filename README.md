@@ -2,7 +2,38 @@
 
 An enterprise-grade AI-powered research assistant that helps researchers, students, and professionals find, analyze, and summarize academic papers and research materials.
 
-## Features
+## 🏗️ Project Structure
+
+```
+ai-research-assistant/
+├── backend/                    # FastAPI Backend
+│   ├── src/                    # Source code
+│   │   ├── main.py            # FastAPI app entry point
+│   │   ├── agents/            # AI agents
+│   │   ├── chains/            # LangChain chains
+│   │   ├── tools/             # Agent tools
+│   │   ├── loaders/           # Document loaders
+│   │   ├── api/               # API routes
+│   │   ├── config/            # Configuration
+│   │   ├── prompts/           # Prompt templates
+│   │   └── utils/             # Utilities
+│   ├── tests/                 # Test suite
+│   ├── scripts/               # Utility scripts
+│   ├── data/                  # Local data storage
+│   ├── logs/                  # Application logs
+│   ├── requirements.txt       # Python dependencies
+│   └── pytest.ini             # Pytest configuration
+│
+├── frontend/                   # Frontend (React.js/Streamlit)
+│   └── README.md              # Frontend setup guide
+│
+├── docker-compose.yml          # Full stack deployment
+├── .gitignore                  # Git ignore rules
+├── .cursorrules                # Cursor AI rules
+└── README.md                   # This file
+```
+
+## ✨ Features
 
 - 🔍 **Multi-Source Search**: Search across ArXiv, PubMed, Google Scholar, and more
 - 📄 **Smart Summarization**: AI-powered paper summaries with key insights
@@ -13,150 +44,34 @@ An enterprise-grade AI-powered research assistant that helps researchers, studen
 - 🔗 **Reference Tracking**: Track citations and related papers
 - 📥 **Export Options**: Export summaries, notes, and citations
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Framework**: LangChain 0.1.0+
+### Backend
+- **Framework**: FastAPI 0.109+
+- **AI Framework**: LangChain 0.1.0+
 - **LLM**: OpenAI GPT-4 / GPT-3.5-turbo
-- **Vector DB**: Pinecone (or Chroma for local development)
+- **Vector DB**: Pinecone (production) / Chroma (development)
 - **Embeddings**: OpenAI text-embedding-3-small
-- **API Framework**: FastAPI 0.104+
 - **Database**: PostgreSQL 14+
 - **Cache**: Redis 7.0+
 - **Monitoring**: LangSmith + Prometheus + Grafana
 
-## Architecture
+### Frontend
+- **Framework**: React.js (recommended) or Streamlit
+- **Status**: 🚧 In Development
 
-```
-┌─────────────────┐
-│   User Query    │
-└────────┬────────┘
-         │
-    ┌────▼─────┐
-    │  Router  │
-    │  Agent   │
-    └────┬─────┘
-         │
-    ┌────┴────────────────────┐
-    │                         │
-┌───▼────────┐      ┌────────▼─────┐
-│  Search    │      │  Q&A Agent   │
-│  Agent     │      │  (RAG)       │
-└───┬────────┘      └────────┬─────┘
-    │                        │
-┌───▼────────┐      ┌────────▼─────┐
-│ ArXiv API  │      │  Vector DB   │
-│ PubMed API │      │  (Pinecone)  │
-│ Scholar API│      │              │
-└────────────┘      └──────────────┘
-         │                  │
-    ┌────▼──────────────────▼────┐
-    │   Summarization Agent      │
-    └────┬───────────────────────┘
-         │
-    ┌────▼────────┐
-    │  Response   │
-    └─────────────┘
-```
-
-## Project Structure
-
-```
-ai-research-assistant/
-├── .env.development
-├── .env.production
-├── .gitignore
-├── requirements.txt
-├── docker-compose.yml
-├── README.md
-├── src/
-│   ├── __init__.py
-│   ├── main.py                 # FastAPI app entry point
-│   ├── config/
-│   │   ├── __init__.py
-│   │   └── settings.py         # Configuration management
-│   ├── agents/
-│   │   ├── __init__.py
-│   │   ├── router_agent.py     # Main routing agent
-│   │   ├── search_agent.py     # Paper search agent
-│   │   ├── qa_agent.py         # Question answering agent
-│   │   └── summarization_agent.py
-│   ├── chains/
-│   │   ├── __init__.py
-│   │   ├── rag_chain.py        # RAG implementation
-│   │   └── citation_chain.py   # Citation generation
-│   ├── tools/
-│   │   ├── __init__.py
-│   │   ├── arxiv_tool.py       # ArXiv search tool
-│   │   ├── pubmed_tool.py      # PubMed search tool
-│   │   └── pdf_tool.py         # PDF processing tool
-│   ├── loaders/
-│   │   ├── __init__.py
-│   │   ├── arxiv_loader.py     # ArXiv paper loader
-│   │   └── pdf_loader.py       # PDF document loader
-│   ├── prompts/
-│   │   ├── system_prompt.txt
-│   │   ├── search_prompt.txt
-│   │   ├── summarization_prompt.txt
-│   │   └── qa_prompt.txt
-│   ├── memory/
-│   │   ├── __init__.py
-│   │   └── conversation_memory.py
-│   ├── callbacks/
-│   │   ├── __init__.py
-│   │   ├── cost_tracking.py
-│   │   └── monitoring.py
-│   ├── utils/
-│   │   ├── __init__.py
-│   │   ├── logger.py
-│   │   ├── validators.py
-│   │   └── formatters.py
-│   └── api/
-│       ├── __init__.py
-│       ├── routes/
-│       │   ├── __init__.py
-│       │   ├── search.py
-│       │   ├── chat.py
-│       │   └── papers.py
-│       └── models/
-│           ├── __init__.py
-│           └── schemas.py
-├── tests/
-│   ├── __init__.py
-│   ├── unit/
-│   │   ├── test_agents.py
-│   │   ├── test_chains.py
-│   │   └── test_tools.py
-│   ├── integration/
-│   │   ├── test_api.py
-│   │   └── test_workflows.py
-│   └── e2e/
-│       └── test_research_flow.py
-├── docs/
-│   ├── architecture.md
-│   ├── api.md
-│   └── deployment.md
-└── scripts/
-    ├── setup.sh
-    ├── run_dev.sh
-    └── deploy.sh
-```
-
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
-
 - Python 3.10+
-- PostgreSQL 14+
-- Redis 7.0+
-- OpenAI API key
-- Pinecone API key (or use Chroma locally)
+- Node.js 18+ (for React.js frontend)
+- Docker & Docker Compose (optional)
 
-### Installation
+### Backend Setup
 
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-cd ai-research-assistant
+# Navigate to backend directory
+cd backend
 
 # Create virtual environment
 python -m venv venv
@@ -166,92 +81,125 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Setup environment variables
-cp .env.development .env
+cp .env.example .env
 # Edit .env with your API keys
 
-# Run database migrations
-python scripts/setup.sh
-
-# Start the application
-python src/main.py
-```
-
-### Development
-
-```bash
-# Run in development mode with hot reload
+# Run the backend server
 uvicorn src.main:app --reload --port 8000
-
-# Run tests
-pytest tests/ -v --cov=src
-
-# Run linting
-black src/ tests/
-flake8 src/ tests/
-mypy src/
 ```
 
-### Docker
+### Frontend Setup
+
+**React.js (Recommended):**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+**Streamlit:**
+```bash
+cd frontend
+pip install -r requirements.txt
+streamlit run main.py
+```
+
+### Docker Setup (Full Stack)
 
 ```bash
-# Build and run with Docker Compose
+# Start all services
 docker-compose up --build
 
-# Access the API
-curl http://localhost:8000/docs
+# Backend API: http://localhost:8000
+# Frontend: http://localhost:3000
+# API Docs: http://localhost:8000/docs
 ```
 
-## API Endpoints
+## 📡 API Endpoints
 
 ### Search Papers
 ```bash
+GET /api/v1/search?query=transformer+models&max_results=10
 POST /api/v1/search
 {
   "query": "transformer models in NLP",
-  "sources": ["arxiv", "pubmed"],
-  "limit": 10
+  "max_results": 10
 }
 ```
 
-### Chat with Papers
+### Chat/Q&A
 ```bash
 POST /api/v1/chat
 {
-  "message": "What are the key findings?",
-  "paper_ids": ["arxiv:2301.12345"],
-  "session_id": "user-123"
+  "question": "What are the key findings?",
+  "paper_ids": ["arxiv:2301.12345"]
 }
+
+POST /api/v1/chat/stream  # Streaming response
 ```
 
-### Summarize Paper
+### Papers Management
 ```bash
-POST /api/v1/summarize
-{
-  "paper_id": "arxiv:2301.12345",
-  "format": "detailed"
-}
+POST /api/v1/papers/summarize
+GET /api/v1/papers/{paper_id}/summarize
+POST /api/v1/papers/cite
+GET /api/v1/papers/{paper_id}
 ```
 
-## Configuration
-
-Key configuration options in `.env`:
-
+### Health Check
 ```bash
-# LLM Configuration
-OPENAI_API_KEY=your-key-here
+GET /health
+```
+
+## 📁 Directory Structure Details
+
+### Backend (`backend/`)
+- **`src/agents/`**: AI agents (Search, Q&A, Summarization, Router)
+- **`src/chains/`**: LangChain chains (RAG, Citation, Summarization)
+- **`src/tools/`**: Agent tools (ArXiv, PDF, Search)
+- **`src/loaders/`**: Document loaders (ArXiv, PDF)
+- **`src/api/`**: FastAPI routes and schemas
+- **`src/config/`**: Configuration management
+- **`src/prompts/`**: Prompt templates
+- **`tests/`**: Unit, integration, and E2E tests
+
+### Frontend (`frontend/`)
+- **Status**: 🚧 Ready for React.js or Streamlit setup
+- See `FRONTEND_COMPARISON.md` for options
+
+## 🔧 Configuration
+
+### Backend Environment Variables
+
+Create `backend/.env`:
+
+```env
+# Environment
+ENVIRONMENT=development
+DEBUG=true
+
+# API Configuration
+API_V1_PREFIX=/api/v1
+SECRET_KEY=your-secret-key-here
+
+# OpenAI
+OPENAI_API_KEY=your-openai-key-here
 LLM_MODEL=gpt-4
 EMBEDDING_MODEL=text-embedding-3-small
 
 # Vector Database
-PINECONE_API_KEY=your-key-here
-PINECONE_ENVIRONMENT=us-west1-gcp
+VECTOR_DB_TYPE=chroma  # or pinecone
+CHROMA_PERSIST_DIRECTORY=./data/chroma
+
+# Pinecone (if using)
+PINECONE_API_KEY=your-pinecone-key
 PINECONE_INDEX_NAME=research-papers
 
 # Database
 DATABASE_URL=postgresql://user:pass@localhost:5432/research_db
 
 # Redis
-REDIS_URL=redis://localhost:6379
+REDIS_URL=redis://localhost:6379/0
 
 # Monitoring
 LANGCHAIN_TRACING_V2=true
@@ -259,66 +207,94 @@ LANGCHAIN_PROJECT=ai-research-assistant
 LANGCHAIN_API_KEY=your-langsmith-key
 ```
 
-## Features Roadmap
+## 🧪 Testing
 
-### Phase 1 (Week 1-2) - MVP
-- [x] Basic RAG system
+```bash
+cd backend
+
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=src --cov-report=html
+
+# Run specific test file
+pytest tests/unit/test_agents.py -v
+```
+
+## 📚 Documentation
+
+- **Backend API Docs**: http://localhost:8000/docs (Swagger UI)
+- **Testing Guide**: `backend/TESTING_GUIDE.md`
+- **Frontend Comparison**: `FRONTEND_COMPARISON.md`
+- **Quick Start**: `QUICK_START.md`
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐
+│   Frontend       │
+│   (React.js)     │
+└────────┬─────────┘
+         │ HTTP/REST
+    ┌────▼─────┐
+    │  Backend │
+    │ (FastAPI)│
+    └────┬─────┘
+         │
+    ┌────┴────────────────────┐
+    │                         │
+┌───▼────────┐      ┌────────▼─────┐
+│  Router    │      │  Q&A Agent   │
+│  Agent     │      │  (RAG)       │
+└───┬────────┘      └────────┬─────┘
+    │                        │
+┌───▼────────┐      ┌────────▼─────┐
+│ ArXiv API  │      │  Vector DB   │
+│ PubMed API │      │  (Pinecone)  │
+└────────────┘      └──────────────┘
+```
+
+## 🚧 Roadmap
+
+### Phase 1 (Completed) ✅
+- [x] Backend API with FastAPI
+- [x] LangChain agents and chains
 - [x] ArXiv integration
-- [x] Simple Q&A
-- [x] PDF processing
-- [x] Basic API
+- [x] RAG system
+- [x] Basic testing
 
-### Phase 2 (Week 3-4) - Enhanced
-- [ ] Multi-source search (PubMed, Scholar)
-- [ ] Citation management
-- [ ] Advanced summarization
+### Phase 2 (In Progress) 🚧
+- [ ] Frontend (React.js)
 - [ ] User authentication
-- [ ] Session management
+- [ ] Advanced search filters
+- [ ] Citation management UI
 
-### Phase 3 (Week 5-6) - Advanced
-- [ ] Multi-agent orchestration
-- [ ] Research insights extraction
+### Phase 3 (Planned) 📋
+- [ ] Multi-source search (PubMed, Scholar)
+- [ ] User profiles and saved papers
 - [ ] Collaborative features
-- [ ] Export options
-- [ ] Analytics dashboard
+- [ ] Mobile app (React Native)
 
-### Phase 4 (Future)
-- [ ] Mobile app
-- [ ] Browser extension
-- [ ] Zotero/Mendeley integration
-- [ ] Team collaboration
-- [ ] Custom research workflows
+## 🤝 Contributing
 
-## Performance Metrics
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-- **Response Time**: < 2s for search, < 5s for summarization
-- **Accuracy**: 90%+ relevant results
-- **Cost**: ~$0.05 per research query
-- **Uptime**: 99.9% SLA
+## 📝 License
 
-## Contributing
+This project is licensed under the MIT License.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+## 🙏 Acknowledgments
 
-## License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
-## Support
-
-- Documentation: [docs/](docs/)
-- Issues: GitHub Issues
-- Email mtalharana093@gmail.com
-
-## Acknowledgments
-
-Built with:
-- [LangChain](https://langchain.com)
-- [OpenAI](https://openai.com)
-- [Pinecone](https://pinecone.io)
-- [FastAPI](https://fastapi.tiangolo.com)
+- LangChain for the AI framework
+- OpenAI for LLM capabilities
+- FastAPI for the web framework
+- ArXiv for research paper access
 
 ---
 
-**Made with ❤️ for researchers worldwide**
-
+**Built with ❤️ for the research community**
