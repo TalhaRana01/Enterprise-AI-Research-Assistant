@@ -308,7 +308,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 - Documentation: [docs/](docs/)
 - Issues: GitHub Issues
-- Email: support@yourapp.com
+- Email mtalharana093@gmail.com
 
 ## Acknowledgments
 
