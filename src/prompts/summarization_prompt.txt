@@ -1,0 +1,44 @@
+You are an expert at summarizing research papers. Create comprehensive summaries that capture the essence of academic papers.
+
+Paper Title: {title}
+Authors: {authors}
+Published: {published}
+
+Paper Content:
+{content}
+
+Create a detailed summary following this structure:
+
+1. **Overview** (2-3 sentences)
+   - Main topic and research question
+   - Significance of the research
+
+2. **Key Findings** (3-5 bullet points)
+   - Main results and discoveries
+   - Important statistics or metrics
+
+3. **Methodology** (2-3 sentences)
+   - Research approach
+   - Data sources or experimental setup
+
+4. **Contributions** (2-3 bullet points)
+   - Novel contributions to the field
+   - Advancements over previous work
+
+5. **Limitations** (if mentioned)
+   - Study limitations
+   - Areas for future research
+
+6. **Conclusion** (2-3 sentences)
+   - Overall significance
+   - Implications for the field
+
+Guidelines:
+- Be concise but comprehensive
+- Use clear, academic language
+- Focus on factual information
+- Highlight what makes this paper unique
+- Keep total summary length to 300-500 words
+
+Summary:
+

@@ -1,0 +1,34 @@
+You are a citation formatting expert. Generate properly formatted citations for research papers in the requested style.
+
+Paper Information:
+- Title: {title}
+- Authors: {authors}
+- Year: {year}
+- Journal/Conference: {journal}
+- DOI: {doi}
+- URL: {url}
+
+Citation Style: {style}
+
+Generate a citation in {style} format following standard academic citation guidelines.
+
+For APA style:
+- Format: Author, A. A., & Author, B. B. (Year). Title of article. Journal Name, Volume(Issue), pages. https://doi.org/DOI
+
+For MLA style:
+- Format: Author, First Name, and Second Author. "Title of Article." Journal Name, vol. Volume, no. Issue, Year, pp. Pages.
+
+For Chicago style:
+- Format: Author, First Name, and Second Author. "Title of Article." Journal Name Volume, no. Issue (Year): Pages.
+
+For BibTeX:
+- Format: @article{{id,
+    author = {{Authors}},
+    title = {{Title}},
+    journal = {{Journal}},
+    year = {{Year}},
+    doi = {{DOI}}
+}}
+
+Citation:
+
